@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Control Relé ESP32</title>
+</head>
+<body>
+<h1>Control Relé ESP32</h1>
+<button onclick="connectBLE()">Conectar</button>
+<button onclick="turnOn()">Encender</button>
+<button onclick="turnOff()">Apagar</button>
+
+<script>
+let device;
+let characteristic;
+
+async function connectBLE() {
+  device = await navigator.bluetooth.requestDevice({
+    filters: [{ name: 'ESP32_Relé' }],
+    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+  });
+  const server = await device.gatt.connect();
+  const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+  characteristic = await service.getCharacteristic('abcd1234-5678-1234-5678-abcdef123456');
+  alert('Conectado!');
+}
+
+async function turnOn() {
+  if (characteristic) {
+    let encoder = new TextEncoder();
+    await characteristic.writeValue(encoder.encode('ON'));
+  }
+}
+
+async function turnOff() {
+  if (characteristic) {
+    let encoder = new TextEncoder();
+    await characteristic.writeValue(encoder.encode('OFF'));
+  }
+}
+</script>
+</body>
+</html>
